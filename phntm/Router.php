@@ -84,4 +84,16 @@ class Router
         $route = implode('\\', array_map('ucfirst', $route));
         return 'Pages' . $route . '\\Page';
     }
+
+    /**
+     * Converts a route to a path path in the pages folder
+     *
+     * @returns string
+     */
+    public static function r2p(string $route): string
+    {
+        $route = explode('/', $route);
+        $route = implode('/', array_map('ucfirst', $route));
+        return $route;
+    }
 }

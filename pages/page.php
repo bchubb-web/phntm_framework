@@ -10,8 +10,8 @@ class Page extends AbstractPage
 {
     public function preRender(Request $request): ?Response
     {
-        $this->view->title = 'Home';
-        $this->view->content = 'Welcome to the home page';
+        $this->variables->title = 'Home';
+        $this->variables->content = 'Welcome to the home page';
         return null;
     }
 }
