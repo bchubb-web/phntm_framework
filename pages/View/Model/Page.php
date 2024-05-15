@@ -8,7 +8,8 @@ use Symfony\Component\HttpFoundation\Response;
 
 class Page extends AbstractPage
 {
-    public function preRender(Request $request): void
+    public function preRender(Request $request): ?Response
     {
+        return null;
     }
 }

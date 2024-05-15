@@ -7,5 +7,5 @@ use Symfony\Component\HttpFoundation\Response;
 
 interface PageInterface
 {
-    public function render(): Response;
+    public function render(Request $request): Response;
 }

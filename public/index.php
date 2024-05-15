@@ -25,13 +25,14 @@ try {
         throw new Symfony\Component\Routing\Exception\ResourceNotFoundException('Page not found');
     }
 
-    // render the page
+    /** @var Bchubbweb\PhntmFramework\Pages\AbstractPage $page */
+    $page = new $attributes['_route']();
 
-    $response = new Response('wow', 404);
-
+    $response = $page->render($request);
 } catch (Symfony\Component\Routing\Exception\ResourceNotFoundException $exception) {
     $response = new Response($exception->getMessage(), 404);
 } catch (Exception $exception) {
+    echo $exception->getMessage() . '<br>' . $exception->getTraceAsString();
     $response = new Response('An error occurred', 500);
 }
 

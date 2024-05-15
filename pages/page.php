@@ -8,7 +8,10 @@ use Symfony\Component\HttpFoundation\Response;
 
 class Page extends AbstractPage
 {
-    public function preRender(Request $request): void
+    public function preRender(Request $request): ?Response
     {
+        $this->view->title = 'Home';
+        $this->view->content = 'Welcome to the home page';
+        return null;
     }
 }
