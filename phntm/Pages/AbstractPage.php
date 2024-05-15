@@ -1,13 +1,17 @@
 <?php
 
-namespace Bchubbweb\Phntm\Pages;
+namespace Bchubbweb\PhntmFramework\Pages;
 
-use Bchubbweb\Phntm\Pages\PageInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Bchubbweb\PhntmFramework\Pages\PageInterface;
+use Bchubbweb\PhntmFramework\Pages\View;
 
 abstract class AbstractPage implements PageInterface
 {
-    abstract public function preRender(): void;
+    protected View $view;
+
+    abstract protected function preRender(Request $request): void;
 
     public function render(): Response
     {

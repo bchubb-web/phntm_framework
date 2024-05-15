@@ -1,25 +1,38 @@
 <?php
 
-require_once __DIR__.'/../vendor/autoload.php';
+define('ROOT', realpath(__DIR__ . '/../') );
+
+require_once ROOT .'/vendor/autoload.php';
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Matcher\UrlMatcher;
+use Symfony\Component\Routing\RequestContext;
+
+use Bchubbweb\PhntmFramework\Router;
 
 $request = Request::createFromGlobals();
 
-$map = [
-    '/hello' => __DIR__.'/../pages/hello.php',
-    '/bye'   => __DIR__.'/../pages/bye.php',
-];
+$router = new Router();
 
-$path = $request->getPathInfo();
-if (isset($map[$path])) {
-    ob_start();
-    extract($request->query->all(), EXTR_SKIP);
-    include sprintf(__DIR__.'/../src/pages/%s.php', $map[$path]);
-    $response = new Response(ob_get_clean());
-} else {
-    $response = new Response('Not Found', 404);
+$context = (new RequestContext())->fromRequest($request);
+$matcher = new UrlMatcher($router->routes, $context);
+
+try {
+    $attributes = $matcher->match($request->getPathInfo());
+
+    if (!class_exists($attributes['_route'])) {
+        throw new Symfony\Component\Routing\Exception\ResourceNotFoundException('Page not found');
+    }
+
+    // render the page
+
+    $response = new Response('wow', 404);
+
+} catch (Symfony\Component\Routing\Exception\ResourceNotFoundException $exception) {
+    $response = new Response($exception->getMessage(), 404);
+} catch (Exception $exception) {
+    $response = new Response('An error occurred', 500);
 }
 
 $response->send();

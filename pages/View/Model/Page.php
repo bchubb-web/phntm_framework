@@ -1,6 +1,6 @@
 <?php
 
-namespace Pages;
+namespace Pages\View\Model;
 
 use Bchubbweb\PhntmFramework\Pages\AbstractPage;
 use Symfony\Component\HttpFoundation\Request;
