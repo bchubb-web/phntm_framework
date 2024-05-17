@@ -4,6 +4,7 @@ namespace Bchubbweb\PhntmFramework;
 
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\Route;
+use ReflectionClass;
 
 
 /**
@@ -20,16 +21,82 @@ class Router
     {
         $this->routes = new RouteCollection();
 
+        if (empty($this->autoload())) {
+            exec('composer dumpautoload --optimize');
+        }
+
+    }
+
+    /**
+     * Gathers all Pages\\ routes from autoloaded classes
+     * and adds them to the RouteCollection
+     *
+     * parses Dynamic attributes to gather route variables and their types
+     */
+    public function gatherRoutes(): void
+    {
         $classes = $this->autoload();
 
-        /*if (empty($classes)) {
-            exec('composer dumpautoload --optimize');
-            $classes = $this->autoload();
-        }*/
-
         foreach ($classes as $pageClass => $path) {
-            $this->routes->add($pageClass, new Route(self::n2r($pageClass)));
+
+            $reflection = new ReflectionClass($pageClass);
+            if ($reflection->getAttributes('Bchubbweb\PhntmFramework\Router\Dynamic')) {
+                $denoted_namespace = $reflection->getAttributes('Bchubbweb\PhntmFramework\Router\Dynamic')[0]->getArguments()[0];
+
+                $parts = explode('\\', $denoted_namespace);
+
+                $variables = array_filter($parts, function(string $part) {
+                    return (strpos($part, '{') === 0 && strpos($part, '}') === strlen($part) - 1);
+                });
+                $variables = array_map(function(string $part) {
+                    return substr($part, 1, strlen($part) - 2);
+                }, $variables);
+
+                $mapped_variables = [];
+                $validation_regexes = [];
+
+                foreach ($variables as $variable) {
+                    $default = '';
+                    if (strpos($variable, ':') !== false) {
+                        [$type, $variable] = explode(':', $variable);
+                        $default = match($type) {
+                            'int' => -1,
+                            'string' => '',
+                            'float' => 0.0,
+                            'bool' => false,
+                            'array' => [],
+                            default => '',
+                        };
+                    }
+                    $mapped_variables[$variable] = $default;
+                    $validation_regexes[$variable] = match($type) {
+                        'int' => '\d+',
+                        'string' => '\w+',
+                        'float' => '\d+\.\d+',
+                        'bool' => 'true|false|1|0|yes|no',
+                        'array' => '\w+',
+                        default => '\w+',
+                    };
+                }
+
+                $denoted_namespace_without_types = preg_replace('/{(\w+):([^}]+)}/', '{$2}', $denoted_namespace);
+
+                $this->routes->add($pageClass, new Route(self::n2r($denoted_namespace_without_types), $mapped_variables), 1);
+                continue;
+            }
+
+            $this->routes->add($pageClass, new Route(self::n2r($pageClass)), 2);
         }
+    }
+
+    /**
+     * Dispatches a route
+     *
+     * @returns Route
+     */
+    public function dispatch(string $route): Route
+    {
+        return $this->routes->get($route);
     }
 
     /**
@@ -65,7 +132,7 @@ class Router
     public static function n2r(string $namespace): string
     {
         // remove the namespace and the class name suffix
-        $namespace = rtrim($namespace, '\\Page');
+        $namespace = preg_replace('/\\\Page$/', '', $namespace);
         $namespace = ltrim($namespace, 'Pages');
 
         $namespace = explode('\\', $namespace);

@@ -4,18 +4,36 @@ namespace Bchubbweb\PhntmFramework\Pages;
 
 use Bchubbweb\PhntmFramework\View\TemplateManager;
 use Bchubbweb\PhntmFramework\View\VariableManager;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Bchubbweb\PhntmFramework\Pages\PageInterface;
 use Bchubbweb\PhntmFramework\Router;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+
+
+// TODO: layout to include the view for that folder, not the root, set default 
+// view in constructor, but ability to change it in prerender
+
+
 
 abstract class AbstractPage implements PageInterface
 {
-    protected VariableManager $variables;
+    protected VariableManager $view_variables;
 
-    public function __construct()
+    protected string $default_view = 'view.twig';
+
+    protected string $default_layout = 'layout.twig';
+
+    /**
+     * AbstractPage constructor.
+     *
+     * @param array $dynamic_params
+     */
+    public function __construct(protected array $dynamic_params = [])
     {
-        $this->variables = new VariableManager();
+        // get view.twig relative to the root of the pages folder
+        $this->default_view = Router::r2p(Router::n2r(static::class)) . '/view.twig';
+
+        $this->view_variables = new VariableManager();
     }
 
     abstract protected function preRender(Request $request): ?Response;
@@ -40,12 +58,40 @@ abstract class AbstractPage implements PageInterface
         }
 
         return $response->setContent(
-            $template_manager->render_template('view.twig', $this->variables->getAll())
+            $template_manager->renderTemplate('view.twig', [...$this->view_variables->getAll(), 'content' => $this->default_view])
         );
+    }
+
+    /**
+     * Set the view to be used on render
+     * relative to the root of the pages directory, or previx with ./ for the current directory
+     * TODO                                            ^^^
+     * 
+     * @param string $view
+     */
+    public function setView(string $view): void
+    {
+        if (strpos($view, './') === 0) {
+            $view = Router::r2p(Router::n2r(static::class)) . '/' . substr($view, 2);
+        }
+        $this->default_view = $view;
     }
 
     protected function updateTemplate(string $template, array $data): void
     {
         $this->view->updateTemplate($template, $data);
+    }
+
+    public function setDynamicParams(array $params): void
+    {
+        $this->dynamic_params = $params;
+    }
+
+    public function __get(string $name): mixed
+    {
+        if (array_key_exists($name, $this->dynamic_params)) {
+            return $this->dynamic_params[$name];
+        }
+        return null;
     }
 }

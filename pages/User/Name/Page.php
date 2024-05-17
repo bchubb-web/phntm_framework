@@ -1,17 +1,19 @@
 <?php
 
-namespace Pages;
+namespace Pages\User\Name;
 
 use Bchubbweb\PhntmFramework\Pages\AbstractPage;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Bchubbweb\PhntmFramework\Router\Dynamic;
 
+#[Dynamic('Pages\User\{string:name}')]
 class Page extends AbstractPage
 {
     public function preRender(Request $request): ?Response
     {
-        $this->view_variables->title = 'Home';
-        $this->view_variables->content = 'Welcome to the home page';
+        $this->variables->title = 'User Name';
+        $this->variables->content = 'Welcome to the user name page';
         return null;
     }
 }

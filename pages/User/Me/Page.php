@@ -1,6 +1,6 @@
 <?php
 
-namespace Pages;
+namespace Pages\User\Me;
 
 use Bchubbweb\PhntmFramework\Pages\AbstractPage;
 use Symfony\Component\HttpFoundation\Request;
@@ -10,8 +10,8 @@ class Page extends AbstractPage
 {
     public function preRender(Request $request): ?Response
     {
-        $this->view_variables->title = 'Home';
-        $this->view_variables->content = 'Welcome to the home page';
+        $this->view_variables->title = 'MEEE';
+        $this->setView('../Id/view.twig');
         return null;
     }
 }

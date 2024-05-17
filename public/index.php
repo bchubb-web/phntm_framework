@@ -14,10 +14,10 @@ use Bchubbweb\PhntmFramework\Router;
 $request = Request::createFromGlobals();
 
 $router = new Router();
+$router->gatherRoutes();
 
 $context = (new RequestContext())->fromRequest($request);
 $matcher = new UrlMatcher($router->routes, $context);
-
 try {
     $attributes = $matcher->match($request->getPathInfo());
 
@@ -25,8 +25,12 @@ try {
         throw new Symfony\Component\Routing\Exception\ResourceNotFoundException('Page not found');
     }
 
+    // Remove the route from the attributes
+    $route = $attributes['_route'];
+    unset($attributes['_route']);
+
     /** @var Bchubbweb\PhntmFramework\Pages\AbstractPage $page */
-    $page = new $attributes['_route']();
+    $page = new $route($attributes);
 
     $response = $page->render($request);
 } catch (Symfony\Component\Routing\Exception\ResourceNotFoundException $exception) {
