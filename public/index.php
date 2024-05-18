@@ -16,6 +16,8 @@ $request = Request::createFromGlobals();
 $router = new Router();
 $router->gatherRoutes();
 
+var_dump($router->routes->all());
+
 $context = (new RequestContext())->fromRequest($request);
 $matcher = new UrlMatcher($router->routes, $context);
 try {
@@ -36,8 +38,7 @@ try {
 } catch (Symfony\Component\Routing\Exception\ResourceNotFoundException $exception) {
     $response = new Response($exception->getMessage(), 404);
 } catch (Exception $exception) {
-    echo $exception->getMessage() . '<br>' . $exception->getTraceAsString();
-    $response = new Response('An error occurred', 500);
+    $response = new Response($exception->getMessage(), 500);
 }
 
 $response->send();

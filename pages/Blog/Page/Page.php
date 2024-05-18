@@ -1,20 +1,19 @@
 <?php
 
-namespace Pages\User\Id;
+namespace Pages\Blog\Page;
 
-use Bchubbweb\PhntmFramework\Router\Dynamic;
 use Bchubbweb\PhntmFramework\Pages\AbstractPage;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Bchubbweb\PhntmFramework\Router\Dynamic;
 
-#[Dynamic('Pages\User\{int:id}')]
+#[Dynamic('Pages\Blog\{int:page}')]
 class Page extends AbstractPage
 {
     public function preRender(Request $request): ?Response
     {
-        $this->view_variables->title = $this->id;
-        $this->view_variables->id = $this->id;
-        $this->setView('./view.twig');
+        $this->view_variables->title = $this->page;
+        $this->view_variables->id = $this->page;
 
         return null;
     }

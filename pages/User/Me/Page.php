@@ -11,7 +11,6 @@ class Page extends AbstractPage
     public function preRender(Request $request): ?Response
     {
         $this->view_variables->title = 'MEEE';
-        $this->setView('../Id/view.twig');
         return null;
     }
 }

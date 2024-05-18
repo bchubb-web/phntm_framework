@@ -53,7 +53,6 @@ class Router
                 }, $variables);
 
                 $mapped_variables = [];
-                $validation_regexes = [];
 
                 foreach ($variables as $variable) {
                     $default = '';
@@ -69,23 +68,43 @@ class Router
                         };
                     }
                     $mapped_variables[$variable] = $default;
-                    $validation_regexes[$variable] = match($type) {
-                        'int' => '\d+',
-                        'string' => '\w+',
-                        'float' => '\d+\.\d+',
-                        'bool' => 'true|false|1|0|yes|no',
-                        'array' => '\w+',
-                        default => '\w+',
-                    };
                 }
 
-                $denoted_namespace_without_types = preg_replace('/{(\w+):([^}]+)}/', '{$2}', $denoted_namespace);
+                $typesafe_parts = array_map(function(string $part) {
+                    $type_separator = strpos($part, ':');
+                    if ($type_separator !== false) {
 
-                $this->routes->add($pageClass, new Route(self::n2r($denoted_namespace_without_types), $mapped_variables), 1);
+                        $type = explode(':', $part)[0];
+
+                        $part = preg_replace('/{(\w+):([^}]+)}/', '{$2}', $part);
+                        $part = rtrim($part, '}');
+
+                        // determine the regex for the type
+                        $regex = match(ltrim(trim($type), '{')) {
+                            'int' => '[1-9][0-9]*',
+                            'string' => '[A-Za-z0-9]+(?:-[A-Za-z0-9]+)*',
+                            'float' => '\d+\.\d+',
+                            'bool' => 'true|false|1|0|yes|no',
+                            'array' => '\w+',
+                        };
+                         
+                        if (!$regex) {
+                            return;
+                        }
+                        $part .= '<' . $regex . '>}';
+                    }
+                    return $part;
+                }, $parts);
+                
+                $typesafe_namespace = implode('\\', $typesafe_parts);
+
+                echo $typesafe_namespace . '<br>';
+                echo self::n2r($typesafe_namespace) . '<br>';
+                $this->routes->add($pageClass, new Route(self::n2r($typesafe_namespace), $mapped_variables));
                 continue;
             }
 
-            $this->routes->add($pageClass, new Route(self::n2r($pageClass)), 2);
+            $this->routes->add($pageClass, new Route(self::n2r($pageClass)));
         }
     }
 
