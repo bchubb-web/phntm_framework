@@ -98,11 +98,11 @@ class Router
                 
                 $typesafe_namespace = implode('\\', $typesafe_parts);
 
-                $this->routes->add($pageClass, new Route(self::n2r($typesafe_namespace), $mapped_variables));
+                $this->routes->add($pageClass, new Route(self::n2r($typesafe_namespace), $mapped_variables), 2);
                 continue;
             }
 
-            $this->routes->add($pageClass, new Route(self::n2r($pageClass)));
+            $this->routes->add($pageClass, new Route(self::n2r($pageClass)), 4);
         }
     }
 
