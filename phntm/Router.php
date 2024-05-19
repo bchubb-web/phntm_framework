@@ -2,6 +2,12 @@
 
 namespace Bchubbweb\PhntmFramework;
 
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Matcher\Dumper\CompiledUrlMatcherDumper;
+use Symfony\Component\Routing\Matcher\UrlMatcher;
+use Symfony\Component\Routing\Matcher\CompiledUrlMatcher;
+use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\Route;
 use ReflectionClass;
@@ -15,16 +21,32 @@ use ReflectionClass;
  */
 class Router
 {
+    const CACHE_FILE = ROOT . '/tmp/cache/routes.php';
+
     public RouteCollection $routes;
 
-    public function __construct()
+    private UrlMatcher $matcher;
+
+    public function __construct(Request $request)
     {
         $this->routes = new RouteCollection();
 
-        if (empty($this->autoload())) {
-            exec('composer dumpautoload --optimize');
-        }
+        $context = (new RequestContext())->fromRequest($request);
 
+        if (file_exists(self::CACHE_FILE)) {
+
+            $compiledRoutes = $this->getCachedRoutes();
+
+            $this->matcher = new CompiledUrlMatcher($compiledRoutes, $context);
+
+        } else {
+            exec('composer dumpautoload --optimize');
+
+            $this->gatherRoutes();
+
+            $this->matcher = new UrlMatcher($this->routes, $context);
+            $this->cacheRoutes();
+        }
     }
 
     /**
@@ -107,13 +129,36 @@ class Router
     }
 
     /**
-     * Dispatches a route
+     * Dispatches a route from a given request
      *
+     * @param Request $request
+     * @param array $attributes
      * @returns Route
      */
-    public function dispatch(string $route): Route
+    public function dispatch(Request $request): Response
     {
-        return $this->routes->get($route);
+        try {
+            $attributes = $this->matcher->match($request->getPathInfo());
+
+            if (!class_exists($attributes['_route'])) {
+                throw new \Symfony\Component\Routing\Exception\ResourceNotFoundException('Page not found');
+            }
+
+            $route = $attributes['_route'];
+            unset($attributes['_route']);
+
+            /** @var Bchubbweb\PhntmFramework\Pages\AbstractPage $page */
+            $page = new $route($attributes);
+
+        } catch (\Symfony\Component\Routing\Exception\ResourceNotFoundException $exception) {
+            // if matcher fails
+            return new Response($exception->getMessage(), 404);
+        } catch (\Exception $exception) {
+            // other exceptions
+            return new Response($exception->getMessage(), 500);
+        }
+
+        return $page->render($request);
     }
 
     /**
@@ -179,5 +224,57 @@ class Router
         $route = explode('/', $route);
         $route = implode('/', array_map('ucfirst', $route));
         return $route;
+    }
+
+
+    /**
+     * Caches the routes and saves them to a file
+     *
+     * @returns void
+     */
+    private function cacheRoutes(): bool
+    {
+        $compiledRoutes = (new CompiledUrlMatcherDumper($this->routes))->getCompiledRoutes();
+
+        if (!($filePath = tempnam(ROOT . "/tmp/cache", "temp-phntm-routes-"))) {
+            return false;
+        }
+
+        try {
+            if (!file_put_contents($filePath, "<?php\nreturn " . var_export($compiledRoutes, true) . ";\n")) {
+                throw new \RuntimeException("Failed to save features to temporary file");
+            }
+
+            if (!rename($filePath, self::CACHE_FILE)) {
+                throw new \RuntimeException("Failed to rename temporary file");
+            }
+        } catch (\RuntimeException $e) {
+            if (file_exists($filePath)) {
+                unlink($filePath);
+            }
+
+            return false;
+
+        } finally {
+            if (file_exists($filePath)) {
+                unlink($filePath);
+                return true;
+            }
+            unlink($filePath);
+        }
+
+        return false;
+    }
+
+    /**
+     * Loads cached routes
+     *
+     * @param RequestContext $context
+     */
+    private function getCachedRoutes(): array
+    {
+        /** @var array $compiledRoutes */
+        $compiledRoutes = require_once self::CACHE_FILE;
+        return $compiledRoutes;
     }
 }

@@ -1,4 +1,4 @@
 /vendor/
 pages/*
 
-/tmp/cache/twig
+/tmp/cache/*
