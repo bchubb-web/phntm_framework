@@ -12,8 +12,9 @@ class Page extends AbstractPage
 {
     public function preRender(Request $request): ?Response
     {
-        $this->variables->title = 'User Name';
-        $this->variables->content = 'Welcome to the user name page';
+        $this->view_variables->title = 'User - ' . $this->name;
+        $this->view_variables->content = 'Welcome to the user name page';
+        $this->view_variables->name = $this->name;
         return null;
     }
 }

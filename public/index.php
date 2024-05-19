@@ -16,8 +16,6 @@ $request = Request::createFromGlobals();
 $router = new Router();
 $router->gatherRoutes();
 
-var_dump($router->routes->all());
-
 $context = (new RequestContext())->fromRequest($request);
 $matcher = new UrlMatcher($router->routes, $context);
 try {

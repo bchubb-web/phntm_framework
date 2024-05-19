@@ -91,15 +91,13 @@ class Router
                         if (!$regex) {
                             return;
                         }
-                        $part .= '<' . $regex . '>}';
-                    }
+                        $part .= "<$regex>}";
+                    };
                     return $part;
                 }, $parts);
                 
                 $typesafe_namespace = implode('\\', $typesafe_parts);
 
-                echo $typesafe_namespace . '<br>';
-                echo self::n2r($typesafe_namespace) . '<br>';
                 $this->routes->add($pageClass, new Route(self::n2r($typesafe_namespace), $mapped_variables));
                 continue;
             }

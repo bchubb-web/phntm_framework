@@ -32,7 +32,6 @@ abstract class AbstractPage implements PageInterface
     {
         // get view.twig relative to the root of the pages folder
         $this->default_view = Router::r2p(Router::n2r(static::class)) . '/view.twig';
-        echo $this->default_view;
 
         $this->view_variables = new VariableManager();
     }
