@@ -39,7 +39,7 @@ class Router
             $this->matcher = new CompiledUrlMatcher($compiledRoutes, $context);
 
         } else {
-            $this->gatherRoutes();
+            $this->indexRoutes();
 
             $this->matcher = new UrlMatcher($this->routes, $context);
             if ($_ENV['DEP_ENV'] !== 'local') {
@@ -54,7 +54,7 @@ class Router
      *
      * parses Dynamic attributes to gather route variables and their types
      */
-    public function gatherRoutes(): void
+    public function indexRoutes(): void
     {
         $this->routes = new RouteCollection();
 
