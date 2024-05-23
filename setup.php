@@ -1,8 +1,16 @@
 <?php
-require_once __DIR__.'/vendor/autoload.php';
+use Dotenv\Dotenv;
 
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
+ob_start();
 
-$request = Request::createFromGlobals();
-$response = new Response();
+define('ROOT', realpath(__DIR__) );
+define('PAGES', ROOT . '/pages');
+
+require_once ROOT .'/vendor/autoload.php';
+
+$dotenv = Dotenv::createImmutable(ROOT);
+$dotenv->load();
+
+if ($_ENV['DEP_ENV'] === 'local') {
+    exec('cd ..; composer dump-autoload --optimize');
+}

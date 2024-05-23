@@ -29,23 +29,22 @@ class Router
 
     public function __construct(Request $request)
     {
-        $this->routes = new RouteCollection();
 
         $context = (new RequestContext())->fromRequest($request);
 
-        if (file_exists(self::CACHE_FILE)) {
+        if (file_exists(self::CACHE_FILE) && $_ENV['DEP_ENV'] !== 'local') {
 
             $compiledRoutes = $this->getCachedRoutes();
 
             $this->matcher = new CompiledUrlMatcher($compiledRoutes, $context);
 
         } else {
-            exec('composer dumpautoload --optimize');
-
             $this->gatherRoutes();
 
             $this->matcher = new UrlMatcher($this->routes, $context);
-            $this->cacheRoutes();
+            if ($_ENV['DEP_ENV'] !== 'local') {
+                $this->cacheRoutes();
+            }
         }
     }
 
@@ -57,6 +56,8 @@ class Router
      */
     public function gatherRoutes(): void
     {
+        $this->routes = new RouteCollection();
+
         $classes = $this->autoload();
 
         foreach ($classes as $pageClass => $path) {

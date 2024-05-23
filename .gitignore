@@ -2,3 +2,5 @@
 
 pages/*
 /tmp/cache/*
+
+.env
