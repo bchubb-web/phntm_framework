@@ -27,6 +27,8 @@ class Router
 
     private UrlMatcher $matcher;
 
+    public ?string $notFound = null;
+
     public function __construct(Request $request)
     {
 
@@ -63,6 +65,10 @@ class Router
         foreach ($classes as $pageClass => $path) {
 
             $reflection = new ReflectionClass($pageClass);
+            if ($reflection->getAttributes('Bchubbweb\PhntmFramework\Router\NotFound')) {
+                $this->notFound = $pageClass;
+                continue;
+            }
             if ($reflection->getAttributes('Bchubbweb\PhntmFramework\Router\Dynamic')) {
                 $denoted_namespace = $reflection->getAttributes('Bchubbweb\PhntmFramework\Router\Dynamic')[0]->getArguments()[0];
 
@@ -153,7 +159,11 @@ class Router
 
         } catch (\Symfony\Component\Routing\Exception\ResourceNotFoundException $exception) {
             // if matcher fails
-            return new Response($exception->getMessage(), 404);
+            if ($this->notFound) {
+                $page = new $this->notFound();
+            } else {
+                return new Response('Page not found', 404);
+            }
         } catch (\Exception $exception) {
             // other exceptions
             return new Response($exception->getMessage(), 500);
