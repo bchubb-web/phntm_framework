@@ -6,6 +6,7 @@ use Bchubbweb\PhntmFramework\View\TemplateManager;
 use Bchubbweb\PhntmFramework\View\VariableManager;
 use Bchubbweb\PhntmFramework\Pages\PageInterface;
 use Bchubbweb\PhntmFramework\Router;
+use Bchubbweb\PhntmFramework\Debug;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -34,6 +35,8 @@ abstract class AbstractPage implements PageInterface
         $this->default_view = Router::r2p(Router::n2r(static::class)) . '/view.twig';
 
         $this->view_variables = new VariableManager();
+
+        $this->view_variables->debug_bar = Debug::getDebugBar()->getJavascriptRenderer();
     }
 
     abstract protected function preRender(Request $request): ?Response;
