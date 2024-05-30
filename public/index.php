@@ -1,12 +1,19 @@
 <?php
 
+use Nyholm\Psr7\Factory\Psr17Factory;
+use Symfony\Bridge\PsrHttpMessage\Factory\PsrHttpFactory;
 use Symfony\Component\HttpFoundation\Request;
-use Bchubbweb\PhntmFramework\Router;
+use Bchubbweb\PhntmFramework\Middleware\Router;
+use Relay\Relay;
 
 require_once __DIR__ . '/../setup.php';
 
-$request = Request::createFromGlobals();
+$psr17Factory = new Psr17Factory();
+$psrHttpFactory = new PsrHttpFactory($psr17Factory, $psr17Factory, $psr17Factory, $psr17Factory);
+$request = $psrHttpFactory->createRequest(Request::createFromGlobals());
 
-$response = (new Router($request))->dispatch($request);
+$relay = new Relay([
+    new Router(),
+]);
 
-$response->send();
+$response = $relay->handle($request);

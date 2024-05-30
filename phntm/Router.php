@@ -2,6 +2,8 @@
 
 namespace Bchubbweb\PhntmFramework;
 
+use Psr\Http\Message\ServerRequestInterface;
+use Symfony\Bridge\PsrHttpMessage\Factory\HttpFoundationFactory;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Matcher\Dumper\CompiledUrlMatcherDumper;
@@ -11,7 +13,6 @@ use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\Route;
 use ReflectionClass;
-
 
 /**
  * Handles routing and pages
@@ -29,10 +30,15 @@ class Router
 
     public ?string $notFound = null;
 
-    public function __construct(Request $request)
+    protected Request $request;
+
+    public function __construct(protected ServerRequestInterface $psrRequest)
     {
 
-        $context = (new RequestContext())->fromRequest($request);
+        $httpFoundationFactory = new HttpFoundationFactory();
+        $this->request = $httpFoundationFactory->createRequest($psrRequest);
+
+        $context = (new RequestContext())->fromRequest($this->request);
 
         if (file_exists(self::CACHE_FILE) && $_ENV['DEP_ENV'] !== 'local') {
 
@@ -142,10 +148,10 @@ class Router
      * @param array $attributes
      * @returns Route
      */
-    public function dispatch(Request $request): Response
+    public function dispatch(): Response
     {
         try {
-            $attributes = $this->matcher->match($request->getPathInfo());
+            $attributes = $this->matcher->match($this->request->getPathInfo());
 
             if (!class_exists($attributes['_route'])) {
                 throw new \Symfony\Component\Routing\Exception\ResourceNotFoundException('Page not found');
@@ -169,7 +175,7 @@ class Router
             return new Response($exception->getMessage(), 500);
         }
 
-        return $page->render($request);
+        return $page->render($this->request);
     }
 
     /**

@@ -38,7 +38,7 @@ abstract class AbstractPage implements PageInterface
 
     abstract protected function preRender(Request $request): ?Response;
 
-    public function render($request): Response
+    final public function render($request): Response
     {
 
         $relative_template_location = Router::n2r(static::class);
