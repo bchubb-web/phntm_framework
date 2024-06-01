@@ -3,7 +3,6 @@
 namespace Bchubbweb\PhntmFramework\Middleware;
 
 use Bchubbweb\PhntmFramework\Router as PhntmRouter;
-use Nyholm\Psr7\Factory\Psr17Factory;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -21,13 +20,9 @@ class Router implements MiddlewareInterface
 
         $response = (new PhntmRouter($symfonyRequest))->dispatch();
 
-        $response->send(true);
-
         // convert Symfony response back to PSR-7 response
-        $psr17Factory = new Psr17Factory();
-        $psrHttpFactory = new PsrHttpFactory($psr17Factory, $psr17Factory, $psr17Factory, $psr17Factory);
+        $psrHttpFactory = new PsrHttpFactory();
 
         return $psrHttpFactory->createResponse($response);
-
     }
 }

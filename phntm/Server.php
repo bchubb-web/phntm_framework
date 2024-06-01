@@ -2,24 +2,42 @@
 
 namespace Bchubbweb\PhntmFramework;
 
-use Nyholm\Psr7\Factory\Psr17Factory;
+use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Server\RequestHandlerInterface;
 use Symfony\Bridge\PsrHttpMessage\Factory\PsrHttpFactory;
 use Symfony\Component\HttpFoundation\Request;
 use Bchubbweb\PhntmFramework\Middleware\Router;
 use Relay\Relay;
+use Laminas\HttpHandlerRunner\Emitter\SapiEmitter;
 
 class Server
 {
-    public static function run(): void
-    {
-        $psr17Factory = new Psr17Factory();
-        $psrHttpFactory = new PsrHttpFactory($psr17Factory, $psr17Factory, $psr17Factory, $psr17Factory);
-        $request = $psrHttpFactory->createRequest(Request::createFromGlobals());
+    private RequestHandlerInterface $requestHandler;
 
-        $relay = new Relay([
+    private ServerRequestInterface $request;
+
+    public function __construct()
+    {
+        // request with all relevant data
+        $symfonyRequest = Request::createFromGlobals();
+
+        // convert to PSR-7 request
+        $psrHttpFactory = new PsrHttpFactory();
+        $this->request = $psrHttpFactory->createRequest($symfonyRequest);
+
+        // free up 
+        $psrHttpFactory = null;
+
+        $this->requestHandler = new Relay([
             new Router(),
         ]);
+    }
+    public function run(): void
+    {
+        $response = $this->requestHandler->handle($this->request);
 
-        $response = $relay->handle($request);
+        // send response
+        $emitter = new SapiEmitter();
+        $emitter->emit($response);
     }
 }

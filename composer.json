@@ -28,6 +28,7 @@
         "maximebf/debugbar": "^1.22",
         "symfony/psr-http-message-bridge": "^7.0",
         "nyholm/psr7": "^1.8",
-        "middlewares/debugbar": "^2.1"
+        "middlewares/debugbar": "^2.1",
+        "laminas/laminas-httphandlerrunner": "^2.10"
     }
 }
