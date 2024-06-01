@@ -30,13 +30,8 @@ class Router
 
     public ?string $notFound = null;
 
-    protected Request $request;
-
-    public function __construct(protected ServerRequestInterface $psrRequest)
+    public function __construct(protected Request $request)
     {
-
-        $httpFoundationFactory = new HttpFoundationFactory();
-        $this->request = $httpFoundationFactory->createRequest($psrRequest);
 
         $context = (new RequestContext())->fromRequest($this->request);
 
