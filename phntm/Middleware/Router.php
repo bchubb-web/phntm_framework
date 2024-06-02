@@ -13,19 +13,27 @@ use Nyholm\Psr7\Response;
 
 class Router implements MiddlewareInterface
 {
+    /**
+     * Process an incoming server request.
+     *
+     * Processes an incoming server request in order to produce a response.
+     * If unable to produce the response itself, it may delegate to the provided
+     * request handler to do so.
+     */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        // convert PSR-7 request to Symfony request
+        // convert PSR-7 request to Symfony request for use in router
         $httpFoundationFactory = new HttpFoundationFactory();
         $symfonyRequest = $httpFoundationFactory->createRequest($request);
-
+        
+        // the router will return a found page or a relevant status code
         $page = (new PhntmRouter($symfonyRequest))->dispatch();
 
         if (!$page instanceof PageInterface) {
             return new Response($page);
         }
 
-        // process middleware stack
+        // attempt to process middleware stack
         try {
             $response = $handler->handle($request);
         } catch (\RuntimeException $e) {
