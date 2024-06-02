@@ -6,6 +6,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Symfony\Bridge\PsrHttpMessage\Factory\PsrHttpFactory;
 use Symfony\Component\HttpFoundation\Request;
+use Bchubbweb\PhntmFramework\Middleware\Auth;
 use Bchubbweb\PhntmFramework\Middleware\Router;
 use Relay\Relay;
 use Laminas\HttpHandlerRunner\Emitter\SapiEmitter;
@@ -29,6 +30,7 @@ class Server
         $psrHttpFactory = null;
 
         $this->requestHandler = new Relay([
+            new Auth(),
             new Router(),
         ]);
     }

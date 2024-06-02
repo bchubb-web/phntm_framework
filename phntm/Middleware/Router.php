@@ -22,7 +22,6 @@ class Router implements MiddlewareInterface
 
         // convert Symfony response back to PSR-7 response
         $psrHttpFactory = new PsrHttpFactory();
-
         return $psrHttpFactory->createResponse($response);
     }
 }
