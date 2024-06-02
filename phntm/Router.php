@@ -153,6 +153,23 @@ class Router
             $route = $attributes['_route'];
             unset($attributes['_route']);
 
+            $reflection = new ReflectionClass($route);
+
+            // handle request method restrictions
+            if ($reflection->getAttributes('Bchubbweb\PhntmFramework\Router\Method')) {
+
+                $arguments = $reflection->getAttributes('Bchubbweb\PhntmFramework\Router\Method')[0]->getArguments();
+
+                $methods = $arguments[0];
+                $allow = isset($arguments[1]) ? $arguments[1] : true;
+
+                $matches = in_array($this->request->getMethod(), $methods);
+
+                if ($matches !== $allow) {
+                    return 405;
+                }
+            }
+
             /** @var Bchubbweb\PhntmFramework\Pages\AbstractPage $page */
             $page = new $route($attributes);
 
