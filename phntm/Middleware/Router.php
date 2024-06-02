@@ -11,6 +11,7 @@ use Psr\Http\Server\RequestHandlerInterface;
 use Symfony\Bridge\PsrHttpMessage\Factory\HttpFoundationFactory;
 use Nyholm\Psr7\Response;
 
+
 class Router implements MiddlewareInterface
 {
     /**
@@ -40,8 +41,10 @@ class Router implements MiddlewareInterface
             $response = new Response();
         }
 
+        // render the page content
         $body = $page->render($symfonyRequest);
 
+        // return response with page body
         return $response->withBody($body);
     }
 }

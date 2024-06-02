@@ -9,6 +9,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Bchubbweb\PhntmFramework\Middleware\Auth;
 use Bchubbweb\PhntmFramework\Middleware\Router;
 use Laminas\HttpHandlerRunner\Emitter\SapiEmitter;
+use Middlewares\Whoops;
 use Relay\Relay;
 
 class Server
@@ -32,6 +33,7 @@ class Server
         $this->requestHandler = new Relay([
             new Auth(),
             new Router(),
+            new Whoops(),
         ]);
     }
     public function run(): void
