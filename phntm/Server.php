@@ -8,8 +8,8 @@ use Symfony\Bridge\PsrHttpMessage\Factory\PsrHttpFactory;
 use Symfony\Component\HttpFoundation\Request;
 use Bchubbweb\PhntmFramework\Middleware\Auth;
 use Bchubbweb\PhntmFramework\Middleware\Router;
-use Relay\Relay;
 use Laminas\HttpHandlerRunner\Emitter\SapiEmitter;
+use Relay\Relay;
 
 class Server
 {

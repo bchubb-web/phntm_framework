@@ -2,10 +2,8 @@
 
 namespace Bchubbweb\PhntmFramework;
 
-use Psr\Http\Message\ServerRequestInterface;
-use Symfony\Bridge\PsrHttpMessage\Factory\HttpFoundationFactory;
+use Bchubbweb\PhntmFramework\Pages\PageInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Matcher\Dumper\CompiledUrlMatcherDumper;
 use Symfony\Component\Routing\Matcher\UrlMatcher;
 use Symfony\Component\Routing\Matcher\CompiledUrlMatcher;
@@ -143,7 +141,7 @@ class Router
      * @param array $attributes
      * @returns Route
      */
-    public function dispatch(): Response
+    public function dispatch(): PageInterface | int
     {
         try {
             $attributes = $this->matcher->match($this->request->getPathInfo());
@@ -158,19 +156,17 @@ class Router
             /** @var Bchubbweb\PhntmFramework\Pages\AbstractPage $page */
             $page = new $route($attributes);
 
-        } catch (\Symfony\Component\Routing\Exception\ResourceNotFoundException $exception) {
-            // if matcher fails
-            if ($this->notFound) {
-                $page = new $this->notFound();
-            } else {
-                return new Response('Page not found', 404);
-            }
-        } catch (\Exception $exception) {
-            // other exceptions
-            return new Response($exception->getMessage(), 500);
-        }
+            return $page;
 
-        return $page->render($this->request);
+        } catch (\Symfony\Component\Routing\Exception\ResourceNotFoundException $exception) {
+
+            // if matcher fails
+            return $this->notFound ? new $this->notFound : 404;
+        } catch (\Exception $exception) {
+
+            // if any error occurs
+            return 500;
+        }
     }
 
     /**

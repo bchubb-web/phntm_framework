@@ -7,8 +7,9 @@ use Bchubbweb\PhntmFramework\View\VariableManager;
 use Bchubbweb\PhntmFramework\Pages\PageInterface;
 use Bchubbweb\PhntmFramework\Router;
 use Bchubbweb\PhntmFramework\Debug;
+use Nyholm\Psr7\Stream;
+use Psr\Http\Message\StreamInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 
 
 // TODO: layout to include the view for that folder, not the root, set default 
@@ -39,9 +40,9 @@ abstract class AbstractPage implements PageInterface
         $this->view_variables->debug_bar = Debug::getDebugBar()->getJavascriptRenderer();
     }
 
-    abstract protected function preRender(Request $request): ?Response;
+    abstract protected function preRender(Request $request): void;
 
-    final public function render($request): Response
+    final public function render($request): StreamInterface
     {
 
         $relative_template_location = Router::n2r(static::class);
@@ -52,17 +53,13 @@ abstract class AbstractPage implements PageInterface
         if (!file_exists(ROOT . '/pages' . $relative_template_location . 'view.twig')) {
             throw new \Exception('Template not found');
         }
+
+        static::preRender($request);
+
         $template_manager = new TemplateManager($relative_template_location);
+        $body = $template_manager->renderTemplate('view.twig', [...$this->view_variables->getAll(), 'content' => $this->default_view]);
 
-        $response = static::preRender($request);
-
-        if (is_null($response)) {
-            $response = new Response();
-        }
-
-        return $response->setContent(
-            $template_manager->renderTemplate('view.twig', [...$this->view_variables->getAll(), 'content' => $this->default_view])
-        );
+        return Stream::create($body);
     }
 
     /**

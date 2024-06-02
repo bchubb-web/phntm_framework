@@ -3,9 +3,9 @@
 namespace Bchubbweb\PhntmFramework\Pages;
 
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
+use Psr\Http\Message\StreamInterface;
 
 interface PageInterface
 {
-    public function render(Request $request): Response;
+    public function render(Request $request): StreamInterface;
 }

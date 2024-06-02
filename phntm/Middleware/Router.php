@@ -2,13 +2,14 @@
 
 namespace Bchubbweb\PhntmFramework\Middleware;
 
+use Bchubbweb\PhntmFramework\Pages\PageInterface;
 use Bchubbweb\PhntmFramework\Router as PhntmRouter;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Symfony\Bridge\PsrHttpMessage\Factory\HttpFoundationFactory;
-use Symfony\Bridge\PsrHttpMessage\Factory\PsrHttpFactory;
+use Nyholm\Psr7\Response;
 
 class Router implements MiddlewareInterface
 {
@@ -18,10 +19,21 @@ class Router implements MiddlewareInterface
         $httpFoundationFactory = new HttpFoundationFactory();
         $symfonyRequest = $httpFoundationFactory->createRequest($request);
 
-        $response = (new PhntmRouter($symfonyRequest))->dispatch();
+        $page = (new PhntmRouter($symfonyRequest))->dispatch();
 
-        // convert Symfony response back to PSR-7 response
-        $psrHttpFactory = new PsrHttpFactory();
-        return $psrHttpFactory->createResponse($response);
+        if (!$page instanceof PageInterface) {
+            return new Response($page);
+        }
+
+        // process middleware stack
+        try {
+            $response = $handler->handle($request);
+        } catch (\RuntimeException $e) {
+            $response = new Response();
+        }
+
+        $body = $page->render($symfonyRequest);
+
+        return $response->withBody($body);
     }
 }
