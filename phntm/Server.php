@@ -32,8 +32,8 @@ class Server
 
         $this->requestHandler = new Relay([
             new Auth(),
-            new Router(),
             new Whoops(),
+            new Router(),
         ]);
     }
     public function run(): void
