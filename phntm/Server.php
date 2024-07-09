@@ -4,11 +4,11 @@ namespace Bchubbweb\PhntmFramework;
 
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-use Symfony\Bridge\PsrHttpMessage\Factory\PsrHttpFactory;
-use Symfony\Component\HttpFoundation\Request;
-use Bchubbweb\PhntmFramework\Middleware\Auth;
 use Bchubbweb\PhntmFramework\Middleware\Router;
+use Bchubbweb\PhntmFramework\Middleware\Dispatcher;
 use Laminas\HttpHandlerRunner\Emitter\SapiEmitter;
+use Nyholm\Psr7\Factory\Psr17Factory;
+use Nyholm\Psr7Server\ServerRequestCreator;
 use Middlewares\Whoops;
 use Relay\Relay;
 
@@ -20,20 +20,24 @@ class Server
 
     public function __construct()
     {
-        // request with all relevant data
-        $symfonyRequest = Request::createFromGlobals();
+        $responseFactory = new Psr17Factory();
+        $serverRequestFactory = new ServerRequestCreator(
+            $responseFactory, // ServerRequestFactory
+            $responseFactory, // UriFactory
+            $responseFactory, // UploadedFileFactory
+            $responseFactory  // StreamFactory
+        );
 
-        // convert to PSR-7 request
-        $psrHttpFactory = new PsrHttpFactory();
-        $this->request = $psrHttpFactory->createRequest($symfonyRequest);
+        $this->request = $serverRequestFactory->fromGlobals();
 
         // free up 
-        $psrHttpFactory = null;
+        $serverRequestFactory = null;
 
         $this->requestHandler = new Relay([
-            new Auth(),
             new Whoops(),
-            new Router(),
+            new Router($responseFactory),
+
+            new Dispatcher($responseFactory), // must go last
         ]);
     }
     public function run(): void

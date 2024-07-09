@@ -50,8 +50,8 @@ class Router
     }
 
     /**
-     * Gathers all Pages\\ routes from autoloaded classes
-     * and adds them to the RouteCollection
+     * Gathers all Pages\\ routes from autoloaded classes and adds them to the 
+     * RouteCollection
      *
      * parses Dynamic attributes to gather route variables and their types
      */
@@ -135,11 +135,9 @@ class Router
     }
 
     /**
-     * Dispatches a route from a given request
+     * Dispatches a route from a given request and returns a page or status code
      *
-     * @param Request $request
-     * @param array $attributes
-     * @returns Route
+     * @returns PageInterface | int
      */
     public function dispatch(): PageInterface | int
     {
