@@ -30,6 +30,7 @@
         "nyholm/psr7": "^1.8",
         "middlewares/debugbar": "^2.1",
         "laminas/laminas-httphandlerrunner": "^2.10",
-        "middlewares/whoops": "^2.0"
+        "middlewares/whoops": "^2.0",
+        "nyholm/psr7-server": "^1.1"
     }
 }
