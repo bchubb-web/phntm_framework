@@ -46,11 +46,12 @@ abstract class AbstractPage implements PageInterface
         $relative_template_location = explode('/', $relative_template_location);
         $relative_template_location = implode('/', array_map('ucfirst', $relative_template_location)) . '/';
 
-        if (!file_exists(ROOT . '/pages' . $relative_template_location . 'view.twig')) {
-            throw new \Exception('Template not found');
-        }
-
         static::preRender($request);
+
+        // no file to render, respond 204
+        if (!file_exists(ROOT . '/pages' . $relative_template_location . 'view.twig')) {
+            return Stream::create('');
+        }
 
         $template_manager = new TemplateManager($relative_template_location);
 

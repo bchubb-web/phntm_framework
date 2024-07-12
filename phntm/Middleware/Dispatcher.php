@@ -39,6 +39,10 @@ class Dispatcher implements \Psr\Http\Server\MiddlewareInterface
         // render the page content
         $body = $page->render($request->getAttribute('symfonyRequest'));
 
+        if ($body->getSize() === 0) {
+            return $response->withStatus(204);
+        }
+
         // return response with page body
         return $response->withBody($body);
     }
