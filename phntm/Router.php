@@ -33,7 +33,7 @@ class Router
 
         $context = (new RequestContext())->fromRequest($this->request);
 
-        if (file_exists(self::CACHE_FILE) && $_ENV['DEP_ENV'] !== 'local') {
+        if (file_exists(self::CACHE_FILE) && !isLocal()) {
 
             $compiledRoutes = $this->getCachedRoutes();
 
@@ -43,7 +43,7 @@ class Router
             $this->indexRoutes();
 
             $this->matcher = new UrlMatcher($this->routes, $context);
-            if ($_ENV['DEP_ENV'] !== 'local') {
+            if (!isLocal()) {
                 $this->cacheRoutes();
             }
         }

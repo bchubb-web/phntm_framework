@@ -3,7 +3,6 @@
 namespace Bchubbweb\PhntmFramework\Pages;
 
 use Bchubbweb\PhntmFramework\View\TemplateManager;
-use Bchubbweb\PhntmFramework\View\VariableManager;
 use Bchubbweb\PhntmFramework\Pages\PageInterface;
 use Bchubbweb\PhntmFramework\Router;
 use Nyholm\Psr7\Stream;
@@ -18,7 +17,9 @@ use Symfony\Component\HttpFoundation\Request;
 
 abstract class AbstractPage implements PageInterface
 {
-    protected VariableManager $view_variables;
+    use Meta;
+
+    protected array $view_variables = [];
 
     protected string $default_view = 'view.twig';
 
@@ -33,8 +34,6 @@ abstract class AbstractPage implements PageInterface
     {
         // get view.twig relative to the root of the pages folder
         $this->default_view = Router::r2p(Router::n2r(static::class)) . '/view.twig';
-
-        $this->view_variables = new VariableManager();
     }
 
     abstract protected function preRender(Request $request): void;
@@ -54,7 +53,12 @@ abstract class AbstractPage implements PageInterface
         static::preRender($request);
 
         $template_manager = new TemplateManager($relative_template_location);
-        $body = $template_manager->renderTemplate('view.twig', [...$this->view_variables->getAll(), 'content' => $this->default_view]);
+
+        $body = $template_manager->renderTemplate([
+            ...$this->view_variables, 
+            'content' => $this->default_view, 
+            'phntm_meta' => $this->getMeta()
+        ]);
 
         return Stream::create($body);
     }
@@ -79,16 +83,16 @@ abstract class AbstractPage implements PageInterface
         $this->view->updateTemplate($template, $data);
     }
 
-    public function setDynamicParams(array $params): void
-    {
-        $this->dynamic_params = $params;
-    }
-
     public function __get(string $name): mixed
     {
         if (array_key_exists($name, $this->dynamic_params)) {
             return $this->dynamic_params[$name];
         }
         return null;
+    }
+
+    final public function renderWith(array $variables): void
+    {
+        $this->view_variables = array_merge($this->view_variables, $variables);
     }
 }

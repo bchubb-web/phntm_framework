@@ -8,25 +8,40 @@ class TemplateManager
 
     protected \Twig\Loader\FilesystemLoader $loader;
 
+    protected string $view_location;
+
     public function __construct(protected string $page_location)
     {
-        $this->loader = new \Twig\Loader\FilesystemLoader( ROOT . '/pages' );
+        $this->loader = new \Twig\Loader\FilesystemLoader( [ROOT . '/phntm/View', PAGES] );
         $this->twig = new \Twig\Environment($this->loader, [
             'cache' => ROOT . '/tmp/cache/twig',
             'debug' => true,
             'strict_variables' => true,
         ]);
+
+        $this->view_location = $this->page_location . 'view.twig';
     }
-    public function renderTemplate(string $template, array $data): string
+
+    public function setView(string $view): void
+    {
+        $this->view_location = $view;
+    }
+
+    public function renderTemplate(array $data): string
     {
         try {
-            $to_render = $this->page_location . 'view.twig';
+            $meta = $data['phntm_meta'];
+            unset($data['phntm_meta']);
 
-            if (file_exists(ROOT . '/pages' .$this->page_location . '/layout.twig')) {
-                $to_render = $this->page_location . '/layout.twig';
-            }
+            $view = $this->twig->render($this->view_location, $data);
 
-            return $this->twig->render($to_render, $data);
+            $document = $this->twig->render('document.twig', [
+                'head' => $meta['head'] ?? '',
+                'body_class' => $meta['body_class'] ?? '',
+                'view' => $view,
+            ]);
+
+            return $document;
 
         } catch (\Twig\Error\Error $e) {
             throw new \Exception('Twig error: ' . $e->getMessage());

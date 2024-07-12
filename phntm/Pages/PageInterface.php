@@ -8,4 +8,6 @@ use Psr\Http\Message\StreamInterface;
 interface PageInterface
 {
     public function render(Request $request): StreamInterface;
+
+    public function renderWith(array $variables): void;
 }
