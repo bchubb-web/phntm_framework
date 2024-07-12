@@ -22,7 +22,7 @@ abstract class AbstractPage implements PageInterface
      *
      * @param array $dynamic_params
      */
-    public function __construct(protected array $dynamic_params = [])
+    final public function __construct(protected array $dynamic_params = [])
     {
         // get view.twig relative to the root of the pages folder
         $this->default_view = Router::r2p(Router::n2r(static::class)) . '/view.twig';
