@@ -9,12 +9,6 @@ use Nyholm\Psr7\Stream;
 use Psr\Http\Message\StreamInterface;
 use Symfony\Component\HttpFoundation\Request;
 
-
-// TODO: layout to include the view for that folder, not the root, set default 
-// view in constructor, but ability to change it in prerender
-
-
-
 abstract class AbstractPage implements PageInterface
 {
     use Meta;
@@ -22,8 +16,6 @@ abstract class AbstractPage implements PageInterface
     protected array $view_variables = [];
 
     protected string $default_view = 'view.twig';
-
-    protected string $default_layout = 'layout.twig';
 
     /**
      * AbstractPage constructor.

@@ -47,27 +47,4 @@ class TemplateManager
             throw new \Exception('Twig error: ' . $e->getMessage());
         }
     }
-
-    // TODO make this work
-    protected function locateLayout(string $route): string
-    {
-        $current = $route;
-
-        while (!$this->hasLayout($current) && $current !== '') {
-            // remove the last part of the route
-            $current = substr($current, 0, strrpos($current, '/'));
-        }
-        
-        if (!$this->hasLayout($current)) {
-            throw new \Exception('No layout found');
-        }
-
-        return ROOT . '/pages' . $route . 'layout.twig';
-    }
-
-    protected function hasLayout(string $route): bool
-    {
-        return file_exists(ROOT . '/pages' . $route . 'layout.twig');
-    }
-
 }
