@@ -4,6 +4,9 @@ namespace Bchubbweb\PhntmFramework\Pages;
 
 trait Meta
 {
+    use Meta\Js;
+    use Meta\Css;
+
     public string $body_class = '';
 
     protected array $body_classes = [];
@@ -17,7 +20,17 @@ trait Meta
 
     protected  function head(): string
     {
-        return "<title>{$this->title}</title>";
+        // page title
+        $head = "<title>{$this->title}</title>";
+
+
+        // javascript
+        $head .= $this->formattedScripts();
+
+        // styles
+        $head .= $this->formattedStyles();
+
+        return $head;
     }
 
     protected function withBodyClass(string $class): void
