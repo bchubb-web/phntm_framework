@@ -1,5 +1,42 @@
 # Use the official PHP image as the base image
-FROM php:8.3-fpm
+FROM php:8.3-apache
 
-# Copy the PHP application code
-COPY . /var/www/html
+# Set the working directory in the container
+WORKDIR /var/www/html
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    git \
+    curl \
+    libpng-dev \
+    libonig-dev \
+    libxml2-dev \
+    zip \
+    unzip
+
+# Clear cache
+RUN apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# Install PHP extensions
+RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd
+
+# Get latest Composer
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
+# Copy composer.json and composer.lock
+COPY composer.json composer.lock ./
+
+# Install project dependencies
+RUN composer install --no-scripts --no-autoloader
+
+# Copy the rest of your app's source code
+COPY . .
+
+# Generate autoload files
+RUN composer dump-autoload --optimize
+
+# Make port 80 available to the world outside this container
+EXPOSE 80
+
+# Run apache2 in the foreground
+CMD ["apache2-foreground"]
