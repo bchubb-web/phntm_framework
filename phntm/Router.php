@@ -259,6 +259,8 @@ class Router
     {
         $compiledRoutes = (new CompiledUrlMatcherDumper($this->routes))->getCompiledRoutes();
 
+        $fileDeleted = false;
+
         if (!($filePath = tempnam(ROOT . "/tmp/cache", "temp-phntm-routes-"))) {
             return false;
         }
@@ -274,16 +276,16 @@ class Router
         } catch (\RuntimeException $e) {
             if (file_exists($filePath)) {
                 unlink($filePath);
+                $fileDeleted = true;
             }
 
             return false;
 
         } finally {
-            if (file_exists($filePath)) {
+            if (file_exists($filePath) && !$fileDeleted) {
                 unlink($filePath);
                 return true;
             }
-            unlink($filePath);
         }
 
         return false;
