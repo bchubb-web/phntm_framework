@@ -14,7 +14,7 @@ class Page extends AbstractPage
     protected function preRender(Request $request): void
     {
         $this->renderWith([
-            'title' => $this->id,
+            'id' => $this->id,
         ]);
     }
 }

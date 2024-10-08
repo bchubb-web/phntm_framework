@@ -15,7 +15,3 @@ if (file_exists(ROOT . '/.env')) {
 }
 
 require_once ROOT . '/functions.php';
-
-if (isLocal()) {
-    exec('cd ..; composer dump-autoload --optimize');
-}
