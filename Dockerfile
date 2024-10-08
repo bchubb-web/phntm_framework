@@ -35,6 +35,12 @@ COPY . .
 # Generate autoload files
 RUN composer dump-autoload --optimize
 
+# make tmp/cache directory
+RUN mkdir -p tmp/cache
+
+# make cache directory writable
+RUN chown -R www-data:www-data tmp/cache
+
 # Change the document root to public
 ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
 RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
