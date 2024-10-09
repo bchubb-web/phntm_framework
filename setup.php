@@ -9,11 +9,9 @@ define('PAGES', ROOT . '/pages');
 require_once ROOT .'/vendor/autoload.php';
 
 
-$dotenv = Dotenv::createImmutable(ROOT);
-$dotenv->load();
+if (file_exists(ROOT . '/.env')) {
+    $dotenv = Dotenv::createImmutable(ROOT);
+    $dotenv->load();
+}
 
 require_once ROOT . '/functions.php';
-
-if (isLocal()) {
-    exec('cd ..; composer dump-autoload --optimize');
-}

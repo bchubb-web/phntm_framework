@@ -40,7 +40,10 @@ class Dispatcher implements \Psr\Http\Server\MiddlewareInterface
         $body = $page->render($request->getAttribute('symfonyRequest'));
 
         if ($body->getSize() === 0) {
-            return $response->withStatus(204);
+            if (!isLocal()) {
+                return $response->withStatus(204);
+            }
+            $body->write('Page body is empty - likely no view.twig or view.twig is empty');
         }
 
         // return response with page body

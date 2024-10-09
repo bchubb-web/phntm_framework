@@ -35,7 +35,7 @@ class TemplateManager
 
             $view = $this->twig->render($this->view_location, $data);
 
-            $document = $this->twig->render('document.twig', [
+            $document = $this->twig->render('Document.twig', [
                 'head' => $meta['head'] ?? '',
                 'body_class' => $meta['body_class'] ?? '',
                 'view' => $view,
