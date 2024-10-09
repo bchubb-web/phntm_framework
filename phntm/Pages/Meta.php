@@ -13,6 +13,8 @@ trait Meta
 
     protected string $title = 'Change me';
 
+    protected string $contentType = 'text/html';
+
     protected function title(string $title): void
     {
         $this->title = $title;
@@ -51,5 +53,17 @@ trait Meta
             'head' => $this->head(),
             'body_class' => $this->bodyClasses(),
         ];
+    }
+
+    final protected function withContentType(string $type): self
+    {
+        $this->contentType = $type;
+
+        return $this;
+    }
+
+    final public function getContentType(): string
+    {
+        return $this->contentType;
     }
 }

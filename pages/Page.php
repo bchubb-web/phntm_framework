@@ -21,7 +21,8 @@ class Page extends AbstractPage
         $this->withInlineCss('body { background-color: #FFF; color: #000; }');
 
         $this->renderWith([
-            'heading' => 'Heading',
+            'heading' => 'Home',
+            'content' => 'This is a home page made with bchubbweb/phntm_framework, a simple PHP framework.',
         ]);
 
         if (isProduction()) {

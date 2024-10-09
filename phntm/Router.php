@@ -3,6 +3,7 @@
 namespace Bchubbweb\PhntmFramework;
 
 use Bchubbweb\PhntmFramework\Pages\PageInterface;
+use Bchubbweb\PhntmFramework\Pages\Sitemap\Page as Sitemap;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Matcher\Dumper\CompiledUrlMatcherDumper;
 use Symfony\Component\Routing\Matcher\UrlMatcher;
@@ -132,6 +133,7 @@ class Router
 
             $this->routes->add($pageClass, new Route(self::n2r($pageClass)), 4);
         }
+        $this->routes->add(Sitemap::class, new Route('/sitemap.xml'), 4);
     }
 
     /**
@@ -301,5 +303,10 @@ class Router
         /** @var array $compiledRoutes */
         $compiledRoutes = require_once self::CACHE_FILE;
         return $compiledRoutes;
+    }
+
+    public function getRoutes(): RouteCollection
+    {
+        return $this->routes;
     }
 }

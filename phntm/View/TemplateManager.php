@@ -12,7 +12,11 @@ class TemplateManager
 
     public function __construct(protected string $page_location)
     {
-        $this->loader = new \Twig\Loader\FilesystemLoader( [ROOT . '/phntm/View', PAGES] );
+        $this->loader = new \Twig\Loader\FilesystemLoader([
+            PAGES,
+            ROOT . '/phntm/Pages',
+            ROOT . '/phntm/View',
+        ]);
         $this->twig = new \Twig\Environment($this->loader, [
             'cache' => ROOT . '/tmp/cache/twig',
             'debug' => true,
@@ -27,13 +31,17 @@ class TemplateManager
         $this->view_location = $view;
     }
 
-    public function renderTemplate(array $data): string
+    public function renderTemplate(array $data, bool $use_document): string
     {
         try {
             $meta = $data['phntm_meta'];
             unset($data['phntm_meta']);
 
             $view = $this->twig->render($this->view_location, $data);
+
+            if (!$use_document) {
+                return $view;
+            }
 
             $document = $this->twig->render('Document.twig', [
                 'head' => $meta['head'] ?? '',
@@ -44,7 +52,7 @@ class TemplateManager
             return $document;
 
         } catch (\Twig\Error\Error $e) {
-            throw new \Exception('Twig error: ' . $e->getMessage());
+            throw $e;
         }
     }
 }

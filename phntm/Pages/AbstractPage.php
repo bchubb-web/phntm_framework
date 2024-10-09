@@ -17,6 +17,10 @@ abstract class AbstractPage implements PageInterface
 
     protected string $default_view = 'view.twig';
 
+    protected bool $use_document = true;
+
+    protected bool $is_framework_page = false;
+
     /**
      * AbstractPage constructor.
      *
@@ -40,8 +44,16 @@ abstract class AbstractPage implements PageInterface
 
         static::preRender($request);
 
-        // no file to render, respond 204
-        if (!file_exists(ROOT . '/pages' . $relative_template_location . 'view.twig')) {
+        $possibleFileLocation = ROOT . '/pages' . $relative_template_location . 'view.twig';
+
+        if ($this->is_framework_page) {
+            $relative_template_location = str_replace('Bchubbweb/PhntmFramework/Pages', '', $relative_template_location);
+            $possibleFileLocation = ROOT . '/phntm/Pages' . $relative_template_location . 'view.twig';
+        }
+
+        // if no view file exists, return an empty stream
+        if (!file_exists($possibleFileLocation)) {
+            $this->withContentType('text/html');
             return Stream::create('');
         }
 
@@ -49,9 +61,8 @@ abstract class AbstractPage implements PageInterface
 
         $body = $template_manager->renderTemplate([
             ...$this->view_variables, 
-            'content' => $this->default_view, 
             'phntm_meta' => $this->getMeta()
-        ]);
+        ], $this->use_document);
 
         return Stream::create($body);
     }

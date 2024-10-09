@@ -46,6 +46,8 @@ class Dispatcher implements \Psr\Http\Server\MiddlewareInterface
             $body->write('Page body is empty - likely no view.twig or view.twig is empty');
         }
 
+        $response = $response->withHeader('Content-Type', $page->getContentType());
+
         // return response with page body
         return $response->withBody($body);
     }
