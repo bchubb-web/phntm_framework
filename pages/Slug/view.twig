@@ -1,0 +1,20 @@
+<header class="w-full flex justify-between py-4 border-b">
+    <h1 class="
+        text-2xl font-serif font-bold
+    ">
+        {{ heading }}
+    </h1>
+    <nav class="flex gap-4 items-center">
+        {% for link in nav %}
+            <a href="{{ link.getFullUrl() }}" class="
+                hover:text-blue-700
+            ">
+                {{ link.title }}
+            </a>
+        {% endfor %}
+    </nav>
+</header>
+<br>
+<p>
+    {{ content|raw }}
+</p>

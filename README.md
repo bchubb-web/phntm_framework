@@ -22,7 +22,7 @@ docker build -t myproject .
 
 ### And run the container
 ```bash
-docker run -p 8080:80 -e DEP_ENV={local|staging|production} myproject
+docker run -v $(pwd):/var/www/html -p 8080:80 -e DEP_ENV={local|staging|production} myproject
 ```
 
 ## Routing
