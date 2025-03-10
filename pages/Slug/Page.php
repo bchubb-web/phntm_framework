@@ -3,16 +3,30 @@
 namespace Pages\Slug;
 
 use Phntm\Lib\Model\SimplePage;
-use Phntm\Lib\Db\Db;
-use Phntm\Lib\Images\Responsive;
 use Phntm\Lib\Infra\Routing\Attributes\Dynamic;
 use Phntm\Lib\Pages\RichPage;
+use Spatie\Image\Drivers\ImageDriver;
+use Spatie\Image\Enums\Fit;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Routing\Exception\ResourceNotFoundException;
+use Symfony\Component\Routing\Exception\ResourceNotFoundException as NotFound;
 
+/** @property SimplePage $page */
 #[Dynamic('Pages\{slug}', defaults: ['slug' => ''])]
 class Page extends RichPage
 {
+    public function __invoke(Request $request): void
+    {
+        $this->page->image->configure(
+            fn(ImageDriver $config): ImageDriver => $config
+                ->fit(Fit::Crop, 1200, 400)
+        );
+
+        $this->renderWith([
+            'nav' => SimplePage::where('include_in_nav', true),
+        ]);
+
+    }
+
     public function __construct(array $dynamic_params = [])
     {
         parent::__construct($dynamic_params);
@@ -21,29 +35,10 @@ class Page extends RichPage
             return SimplePage::where('slug', $dynamic_params['slug']);
         });
 
-        $this->withScript('https://unpkg.com/@tailwindcss/browser@4');
-    }
-
-    public function __invoke(Request $request): void
-    {
-        $this->withBodyClass('max-w-7xl mx-auto font-sans px-4 sm:px-6 lg:px-8');
-
         if (!$this->page) {
-            throw new ResourceNotFoundException('Page not found', 404);
+            throw new NotFound('Page not found', 404);
         }
 
-        $hero = new Responsive(
-            location: 'phntm-1.jpeg',
-            mobileFirstSizes: true
-        );
-
-        $nav = [];
-
-        $this->renderWith([
-            'heading' => $this->page->title,
-            'content' => $this->page->content,
-            'hero' => $hero,
-            'nav' => SimplePage::where('include_in_nav', true),
-        ]);
+        $this->withScript('https://unpkg.com/@tailwindcss/browser@4');
     }
 }

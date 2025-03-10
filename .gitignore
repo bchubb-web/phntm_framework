@@ -3,3 +3,7 @@
 /tmp/cache/*
 
 .env
+
+/images/uploads/*
+
+/public/images/*
