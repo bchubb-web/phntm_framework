@@ -21,12 +21,18 @@ return [
         ],
     ],
     'site' => [
-        'url' => 'https://phntm.phntm-framework.orb.local',
-        'host' => 'phntm.phntm-framework.orb.local',
+        'name' => 'Acme',
+        'logo' => '/images/logo.png',
     ],
     'view' => [
         'load_from' => [
-            ROOT . '/layouts',
+            ROOT . '/view',
         ]
-    ]
+    ],
+    'images' => [
+        'load_from' => [
+            ROOT . '/images',
+        ],
+        'public' => ROOT . '/public',
+    ],
 ];

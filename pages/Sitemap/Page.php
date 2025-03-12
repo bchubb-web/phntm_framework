@@ -18,7 +18,9 @@ class Page extends Renderable
 
         $router = new Router($request);
         $routes = array_filter($router->getRoutes()->all(), function ($class) {
-            return !is_a($class, \Phntm\Lib\Pages\Manageable::class, true);
+            return !(is_a($class, \Phntm\Lib\Pages\Manageable::class, true)
+                || $class::$hideFromSitemap)
+            ;
         }, ARRAY_FILTER_USE_KEY);
 
         $this->renderWith([

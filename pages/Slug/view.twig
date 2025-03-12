@@ -1,28 +1,14 @@
-{% extends 'html.twig' %}
+{% extends 'site.twig' %}
 
 {% block body_class %}max-w-7xl mx-auto font-sans px-4 sm:px-6 lg:px-8{% endblock %}
 
-{% block body %}
+{% block main %}
+    {{ hero.withClass('w-full h-96 object-cover mb-4') }}
 
-    <header class="w-full flex justify-between py-4 border-b">
-        <h1 class="
-            text-2xl font-serif font-bold
-        ">
-            {{ this.page.title }}
-        </h1>
-        <nav class="flex gap-4 items-center">
-            {% for link in nav %}
-                <a href="{{ link.getFullUrl() }}" class="
-                    hover:text-blue-700
-                ">
-                    {{ link.title }}
-                </a>
-            {% endfor %}
-        </nav>
-    </header>
-    <br>
-    {{ this.page.image.withClass('w-full h-96 object-cover mb-4')|raw }}
+    {% if this.page.image %}
+        {{ this.page.image.withClass('w-full h-96 object-cover mb-4') }}
+    {% endif %}
     <p>
         {{ this.page.content|raw }}
     </p>
-{% endblock %}
+{% endblock main %}

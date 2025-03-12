@@ -1,0 +1,10 @@
+{% extends 'html.twig' %}
+
+{% block body %}
+    {% include 'layout/header.twig' with {
+        'title': config('site.name'),
+    } %}
+    <main>
+        {% block main %}{% endblock %}
+    </main>
+{% endblock body %}

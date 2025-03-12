@@ -1,0 +1,17 @@
+<header class="w-full flex justify-between py-4 border-b mb-6">
+    <h1 class="
+        text-2xl font-serif font-bold
+    ">
+        {{ title }}
+    </h1>
+    <nav class="flex gap-4 items-center">
+        {% set nav = Container.get("Phntm\\Lib\\Site\\Navigation\\ResolverInterface").resolve() %}
+        {% for link in nav %}
+            <a href="{{ link.getFullUrl() }}" class="
+                hover:text-blue-700
+            ">
+                {{ link.title }}
+            </a>
+        {% endfor %}
+    </nav>
+</header>

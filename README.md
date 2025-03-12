@@ -1,6 +1,23 @@
 # phntm
 A lightweight framework designed to feel like magic; blending aspects of laravel and nextjs for the best developer experience.
 
+It's aim is to pull the focus of developement towards the features CUSTOMERS and USERS care about, not what we as developers want, So aspects as routing, templating, and dashboards are all built in, but without the need for you to write any boilerplate code, while providing powerful tools for responsive images, etc at the framework level.
+
+Phntm is based upon MVC principals, but changed to better suit the needs of modern web development, i call this MPE or Model, Page, Endpoint.
+
+## MPE
+
+### Model
+
+Phntm models are built upon doctrine, with inspiration from both symfony and laravel, providing a unified definition in the model class, but using active record for simpler development.
+Models also provides the CMS form schema, interpreted from its `Attributes`, which you will learn more about later.
+
+### Page
+The page is the view, but simplified in the sense that each endpoint has its own page, this can be manually overridden but by default there should be 1 twig file, and 1 php class for every page page in your application.
+
+### Endpoint
+The endpoint is a modified concept of a controller, similar to invokable controllers from laravel, they only trigger
+
 ## Installation
 
 To create a phntm project, you can use the composer create-project command

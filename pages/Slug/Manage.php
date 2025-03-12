@@ -2,15 +2,9 @@
 
 namespace Pages\Slug;
 
-use App\Traits\PageFormSchema;
-use Doctrine\ORM\EntityManager;
-use Phntm\Lib\Http\Redirect;
 use Phntm\Lib\Infra\Routing\Attributes\Dynamic;
-use Phntm\Lib\Model;
-use Phntm\Lib\Pages\AbstractManagePage;
-use Phntm\Lib\Pages\Manage\InstanceEdit;
-use Symfony\Component\HttpFoundation\Request;
 use Phntm\Lib\Model\SimplePage;
+use Phntm\Lib\Pages\Manage\InstanceEdit;
 
 #[Dynamic('Pages\{slug}', defaults: ['slug' => ''])]
 class Manage extends InstanceEdit

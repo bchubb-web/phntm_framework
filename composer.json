@@ -3,12 +3,11 @@
     "description": "a basic framework build from symfony, with filesystem based routing",
     "type": "project",
     "license": "MIT",
-    "version": "1.0.0",
+    "version": "0.1.0",
     "autoload": {
         "psr-4": {
             "App\\": "src/",
             "Pages\\": "pages/",
-            "Bchubbweb\\PhntmFramework\\": "phntm/"
         }
     },
     "authors": [
@@ -17,30 +16,17 @@
             "email": "billy@bchubb.co.uk"
         }
     ],
-    "minimum-stability": "stable",
+    "minimum-stability": "dev",
     "require": {
         "php": "^8.4",
         "symfony/http-foundation": "^7.0",
-        "symfony/routing": "^7.0",
-        "twig/twig": "^3.0",
-        "predis/predis": "^2.2",
-        "vlucas/phpdotenv": "^5.6",
-        "relay/relay": "^3.0",
-        "maximebf/debugbar": "^1.22",
-        "symfony/psr-http-message-bridge": "^7.0",
-        "nyholm/psr7": "^1.8",
-        "middlewares/debugbar": "^2.1",
-        "middlewares/whoops": "^2.0",
-        "nyholm/psr7-server": "^1.1",
-        "bchubbweb/phntm-lib": "dev-main",
-        "symfony/cache": "^7.2",
-        "doctrine/migrations": "^3.8",
-        "spatie/image": "^3.8"
+        "spatie/image": "^3.8",
+        "phntm-framework/phntm-lib": "dev-main"
     },
     "repositories": [
         {
             "type": "vcs",
-            "url": "~/bchubbweb/phntm-lib"
+            "url": "https://github.com/phntm-framework/phntm-lib"
         }
     ]
 }
