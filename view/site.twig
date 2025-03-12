@@ -3,6 +3,7 @@
 {% block body %}
     {% include 'layout/header.twig' with {
         'title': config('site.name'),
+        'nav': Container.get("Phntm\\Lib\\Site\\Navigation\\ResolverInterface").resolve(),
     } %}
     <main>
         {% block main %}{% endblock %}

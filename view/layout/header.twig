@@ -5,7 +5,6 @@
         {{ title }}
     </h1>
     <nav class="flex gap-4 items-center">
-        {% set nav = Container.get("Phntm\\Lib\\Site\\Navigation\\ResolverInterface").resolve() %}
         {% for link in nav %}
             <a href="{{ link.getFullUrl() }}" class="
                 hover:text-blue-700
